@@ -42,6 +42,13 @@ class User < ActiveRecord::Base
     return user if user.has_password?(submitted_password)
   end
   
+  # Demonstrates the use of the ternary operator instead of multiple
+  # return statements as shown above.
+  def self.authenticate_with_salt(id, cookie_salt)
+    user = find_by_id(id)
+    (user && user.salt == cookie_salt) ? user : nil
+  end
+  
   # Private methods to User class
   private
 
