@@ -22,5 +22,8 @@ SampleApp::Application.configure do
 
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
+
+  # Dsiable SSL in development
+  #SslRequirement.disable_ssl_check = true
 end
 

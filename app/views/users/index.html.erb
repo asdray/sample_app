@@ -1,0 +1,10 @@
+<h1>All users</h1>
+
+<%= will_paginate %>
+
+<ul class="users">
+    <%-# Look in partial _user.html.erb for list -%>
+    <%= render @users %>
+</ul>
+
+<%= will_paginate %>
