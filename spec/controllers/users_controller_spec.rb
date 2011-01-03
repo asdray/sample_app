@@ -53,7 +53,43 @@ describe UsersController do
                                            :content => "Next")
       end
 
+      it "should not have delete link" do
+        get :index
+        response.should_not have_selector("a", 'data-method' => "delete",
+                                               :content => "delete")
+      end
+
+      it "should have delete link" do
+        admin = Factory(:user, :email => "admin@example.com", :admin => true)
+        test_sign_in(admin)
+        get :index
+        response.should have_selector("a", 'data-method' => "delete",
+                                           :content => "delete")
+      end
+
     end # End for signed-in users
+
+    #describe "for signed-in admin users" do
+#
+#      before(:each) do
+#        admin = Factory(:user, :email => "admin@example.com", :admin => true)
+#        test_sign_in(admin)
+#
+#        second = Factory(:user, :email => "another@example.com")
+#        third  = Factory(:user, :email => "another@example.net")
+#
+#        @users = [admin, second, third]
+#        30.times do
+#          @users << Factory(:user, :email => Factory.next(:email))
+#        end
+#      end
+#
+#      it "should be successful" do
+#        get :index
+#        response.should be_success
+#      end
+#
+#    end # End for signed-in admin users
 
   end # End GET index
   
@@ -327,8 +363,8 @@ describe UsersController do
     describe "as an admin user" do
 
       before(:each) do
-        admin = Factory(:user, :email => "admin@example.com", :admin => true)
-        test_sign_in(admin)
+        @admin = Factory(:user, :email => "admin@example.com", :admin => true)
+        test_sign_in(@admin)
       end
 
       it "should destroy the user" do
@@ -341,6 +377,13 @@ describe UsersController do
         delete :destroy, :id => @user
         response.should redirect_to(users_path)
       end
+
+      it "should not allow delete of self" do
+        delete :destroy, :id => @admin
+        response.should redirect_to(users_path)
+        flash[:notice].should =~ /User can not delete self/i
+      end
+
     end # End as an admin user
 
   end # End DELETE destroy

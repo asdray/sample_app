@@ -1,8 +1,10 @@
 class UsersController < ApplicationController
   # :only lists those methods that will cause the before_filter to execute.
-  before_filter :authenticate, :only => [:index, :edit, :update, :destroy]
-  before_filter :correct_user, :only => [:edit, :update]
-  before_filter :admin_user,   :only => :destroy
+  before_filter :authenticate,   :only => [:index, :edit, :update, :destroy]
+  before_filter :correct_user,   :only => [:edit, :update]
+  before_filter :admin_user,     :only => :destroy
+  before_filter :delete_current, :only => :destroy
+  before_filter :logged_in_user, :only => [:new, :create]
 
   def index
     @title = "All users"
@@ -73,6 +75,19 @@ class UsersController < ApplicationController
     
     def admin_user
       redirect_to(root_path) unless current_user.admin?
+    end
+    
+    def logged_in_user
+      redirect_to(root_path) unless not signed_in?
+    end
+
+    def delete_current
+      @user = User.find(params[:id])
+
+      if ( current_user?(@user) )
+        flash[:notice] = "User can not delete self."
+        redirect_to users_path
+      end
     end
     
 end
