@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'faker'
 
 describe UsersController do
   render_views
@@ -124,12 +125,33 @@ describe UsersController do
       response.should have_selector("h1>img", :class => "gravatar")
     end
     
+    it "should show the user's pluralize micropost sidebar" do
+      get :show, :id => @user
+      # Check to make sure that the sidebar has a Micropost count
+      response.should have_selector("td.sidebar", :content => "Microposts")
+    end
+    
     it "should show the user's microposts" do
       mp1 = Factory(:micropost, :user => @user, :content => "Foo bar")
       mp2 = Factory(:micropost, :user => @user, :content => "Baz quux")
+
       get :show, :id => @user
       response.should have_selector("span.content", :content => mp1.content)
       response.should have_selector("span.content", :content => mp2.content)
+    end
+    
+    it "should paginate users microposts" do
+        50.times do
+          @user.microposts.create!(:content => Faker::Lorem.sentence(5))
+        end
+
+        get :show, :id => @user
+        response.should have_selector("div.pagination")
+        response.should have_selector("span.disabled", :content => "Previous")
+        response.should have_selector("a", :href => "/users/1?page=2",
+                                           :content => "2")
+        response.should have_selector("a", :href => "/users/1?page=2",
+                                           :content => "Next")
     end
     
   end # End describe GET show

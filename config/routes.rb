@@ -2,10 +2,14 @@ SampleApp::Application.routes.draw do
   #get "sessions/new"
 
   resources :users
-  resources :sessions,   :only => [:new, :create, :destroy]
-  resources :microposts, :only => [:create, :destroy]
 
-  #get "users/new"
+  # Nested routes for user microposts
+  resources :users do
+    resources :microposts
+  end
+
+  resources :sessions,   :only => [:new, :create, :destroy]
+  resources :microposts, :only => [:index, :create, :destroy]
 
   match '/contact', :to => 'pages#contact'
   match '/about',   :to => 'pages#about'
